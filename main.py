@@ -1,24 +1,31 @@
 from PIL import Image, ImageFont, ImageDraw
+import cgi
+import imdb
 
 
 class Text:
     ltrsp = 1; lnsp = 1; lnmax = 2
     colour = (55, 52, 48)
     frame = [50, 550]
+    start = [50, 50]; end = [550, 850]
 
+    # constructor
     def __init__(self, text, font):
         self.text = text
         self.font = font
         self.bl = self.font.getsize(" ")[0]
         self.height = self.font.getsize(" ")[1]
 
+    # writes the text
     def write(self, draw, start, end):
+        self.start = start
         words = self.text.split()
 
-        level = 1; leave = 0
+        level = 1
         posx = start[0]; posy = start[1]
         hor = []; ver = []
 
+        # find spacing for characters
         for word in words:
             wrdsp = []
             wrdsize = 0
@@ -44,56 +51,101 @@ class Text:
             posx += wrdsize
             posx += self.bl
 
+        # print words
         for j in range(len(words)):
             for i in range(len(words[j])):
                 draw.text((hor[j][i], ver[j]), words[j][i], self.colour, self.font)
 
-        return [posx, posy+self.height]
+        self.end = [posx, posy+self.height]
 
 
-background = Image.new('RGB', (600, 900), color=(232, 229, 221))
-movie = Image.open("gatsby.jpg")
-
+# fonts
 title_font = ImageFont.truetype(r'fonts/BarlowSemiCondensed-Bold.ttf', 65)
 year_font = ImageFont.truetype(r'fonts/BarlowCondensed-Thin.ttf', 45)
 label_font = ImageFont.truetype(r'fonts/ArchivoNarrow-Regular.ttf', 18)
 list_font = ImageFont.truetype(r'fonts/BarlowCondensed-Regular.ttf', 22)
 
-if movie.width > movie.height:
-    side_dif = (movie.width - movie.height)/2
-    movie_cropped = movie.crop((side_dif, 0, movie.width-side_dif, movie.height))
-else:
-    side_dif = (movie.height - movie.width) / 2
-    movie_cropped = movie.crop((0, side_dif, movie.width, movie.height-side_dif))
+# make background
+background = Image.new('RGB', (600, 900), color=(232, 229, 221))
 
-movie_edited = movie_cropped.resize((500, 500))
-background.paste(movie_edited, (50, 50))
+ia = imdb.IMDb()
 
-canvas = ImageDraw.Draw(background)
+search = ia.search_movie("the great gatsby")
+movie = ia.get_movie(search[0].movieID)
 
-main_information = {
-    "title": Text("the great gatsby".upper(), title_font),
-    "year": Text("2013", year_font)
+# storing info
+head_info = {
+    "title": Text(movie["title"].upper(), title_font),
+    "year": Text(str(movie["year"]), year_font)
 }
 
-main_information["title"].ltrsp = 0.85
-main_information["title"].lnsp = 0.90
-pt_coor = main_information["title"].write(canvas, (50, 560), 400)
-pt_coor = main_information["year"].write(canvas, (pt_coor[0], pt_coor[1]-main_information["year"].height), 550)
-pt_coor[1] += 6
+director = []
+directorlist = movie['director']
+for i in directorlist:
+    director.append(i['name'])
+
+cast = []
+castlist = movie.data['cast']
+'''
+for i in range(len(castlist)):
+    print("{0}. {1}".format(i, castlist[i]['name']))
+castchoicein = input("\nInput cast choices:")
+'''
+castchoicein = "11 31 40 12 10 15"
+castchoicestr = castchoicein.split()
+castchoice = [int(x) for x in castchoicestr]
+for i in castchoice:
+    cast.append(castlist[i]['name'])
+
+runtime = str(movie['runtimes'][0])+" minutes"
+
+"""
+10. Elizabeth Debicki
+11. Leonardo DiCaprio
+12. Joel Edgerton
+31. Tobey Maguire
+15. Isla Fisher
+40. Carey Mulligan
+
+11 31 40 12 10 15
+"""
 
 addt_information = [
-    ["running time", "143 minutes"],
-    ["directed by", "baz luhrmann"],
-    ["produced by", "Baz luhrmann, Catherine martin, barrie m. osborne, Lucy Fisher, Catherine Knapman, Douglas Wick"],
-    ["starring", "Leonardo DiCaprio, Carey Mulligan, Joel Edgerton, Tobey Maguire, Elizabeth Debicki"]
+    ["running time", runtime],
+    ["genre", ", ".join(movie['genres'])],
+    ["directed by", ", ".join(director)],
+    ["starring", ", ".join(cast)]
 ]
+
+# find and crop image
+picture = Image.open("gatsby.jpg")
+if picture.width > picture.height:
+    side_dif = (picture.width - picture.height)/2
+    picture_cropped = picture.crop((side_dif, 0, picture.width-side_dif, picture.height))
+else:
+    side_dif = (picture.height - picture.width) / 2
+    picture_cropped = picture.crop((0, side_dif, picture.width, picture.height-side_dif))
+
+# print image onto the background
+picture_edited = picture_cropped.resize((500, 500))
+background.paste(picture_edited, (50, 50))
+canvas = ImageDraw.Draw(background)
+
+# printing head info
+head_info["title"].ltrsp = 0.85
+head_info["title"].lnsp = 0.90
+head_info["title"].write(canvas, (50, 560), 400)
+head_info["year"].write(canvas, (head_info["title"].end[0], head_info["title"].end[1]-head_info["year"].height), 550)
+
+# printing additional info
+info = Text("".upper(), list_font)
+info.end[1] = head_info["year"].end[1] + info.height*0.25
 for section in addt_information:
     label = Text(section[0], label_font)
-    coor = label.write(canvas, (label.frame[0], pt_coor[1] + 0.5*label.height), 525)
+    label.write(canvas, (label.frame[0], info.end[1] + 0.5*label.height), 525)
     info = Text(section[1].upper(), list_font)
     info.lnsp = 1.05
-    pt_coor.clear()
-    pt_coor = info.write(canvas, (coor[0]+3, coor[1]-info.height), 510)
+    info.write(canvas, (label.end[0]+3, label.end[1]-info.height), 510)
 
-background.save("test.jpg")
+# saves image
+background.save(movie['title']+'.jpg')
