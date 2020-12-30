@@ -1,0 +1,86 @@
+{% extends "website.html" %}
+{% block title %}
+    Polaroid Poster Maker
+{% endblock %}
+{% block style %}
+#header{
+    margin: 40px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: black;
+    font-size: 60px;
+}
+.results{
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.results a{
+    text-decoration: none;
+}
+.movie_link{
+    width: 30%;
+    margin-bottom: 5%;
+}
+.movie{
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+    color: #434343;
+    padding: 25px;
+    border: 1px solid #5E5E5E;
+    box-shadow: 10px 10px #DCDCDC;
+}
+.movie .poster{
+    width: 100%;
+}
+.movie .title{
+    text-decoration: underline;
+    font-size: 150%;
+    margin: 5% 0 8% 0;
+}
+.movie .year{
+    font-size: 125%;
+    margin-bottom: 5%;
+}
+button{
+    display: block;
+    margin: auto;
+    margin-top: 30px;
+}
+.message{
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 125px;
+}
+.message h3{
+    margin: 0;
+}
+{% endblock %}
+{% block content %}
+    <p id="header">polaroid poster maker</p>
+    <form action="" method="POST">
+        <p>
+            {{form.search(placeholder="enter movie/series name")}}
+        </p>
+        <button type="submit">search</button>
+    </form>
+    {% if results %}
+    <div class="results">
+        {% for movie in results.keys() %}
+        <a class="movie_link" href="{{ url_for('get_poster', movie_id=movie) }}">
+            <div class="movie">
+                <img class="poster" src="{{results[movie]['cover']}}"/><br>
+                <p class="title">{{results[movie]['title']}}</p>
+                <p class="year">{{results[movie]['year']}}</p>
+            </div>
+        </a><br>
+        {% endfor %}
+    </div>
+    <div class="message">
+        <h2><b>can't find the movie/series you're looking for?</b></h2>
+        <h3>try using more accurate search terms in the search bar <br>
+            (get as close to the title as possible!)</h3>
+    </div>
+    {% endif %}
+{% endblock %}
