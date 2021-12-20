@@ -1,6 +1,6 @@
-from .flask_wtf import FlaskForm
-from .wtforms import StringField
-from .wtforms.fields.html5 import URLField
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms.fields.html5 import URLField
 
 
 class SearchForm(FlaskForm):
