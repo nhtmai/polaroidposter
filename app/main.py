@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from forms import SearchForm, DetailsForm
+from .forms import SearchForm, DetailsForm
 from poster import search_movie, Poster
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'polaroidposter'
