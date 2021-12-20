@@ -1,0 +1,74 @@
+{% extends "website.html" %}
+{% block title %}
+    {{title}} Poster
+{% endblock %}
+{% block style %}
+* {
+    box-sizing: border-box;
+}
+.column {
+    float: left;
+    width: 50%;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+form {
+    width: 90%;
+}
+#poster {
+    height: 90vh;
+    position: fixed;
+}
+a{
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+    font-size: 100%;
+    background-color: white;
+    padding: 8px 25px 8px 25px;
+    border: 1px solid #B4B2B2;
+    margin-bottom: 10px;
+    color: #A2A2A2;
+    text-decoration: none;
+}
+a:hover{
+    box-shadow: 5px 5px #DCDCDC;
+}
+a:active{
+    border-color: black;
+    outline: none;
+}
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="column">
+        <form action="" method="POST">
+            <h1>Not the right picture?</h1>
+            <h2>paste the URL for your own picture below</h2>
+            <p>{{form.image_url(placeholder="enter picture url here")}}</p><br>
+
+            <h1>Not the right cast?</h1>
+            <h2>enter your own cast below<br>Ex: Joe Shmoe, Elizabeth Up</h2>
+            <p>{{form.cast_list(placeholder="enter custom cast here")}}</p>
+
+            <h3>when you are satisfied with the information, press refresh and download the image!</h3>
+            <div class="buttons">
+                <button type="submit">refresh</button>
+                <a href="/" id="another">make another poster</a>
+            </div>
+        </form>
+    </div>
+    <div class="column">
+        <img id="poster" src="data:image/jpeg;base64,{{ img_data }}" alt="{{title}} Image">
+    </div>
+
+</div>
+{% endblock %}
