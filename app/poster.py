@@ -64,10 +64,10 @@ class Text:
 
 class Poster:
     # fonts
-    title_font = ImageFont.truetype(r'/fonts/BarlowSemiCondensed-Bold.ttf', 60)
-    year_font = ImageFont.truetype(r'/fonts/BarlowCondensed-Thin.ttf', 45)
-    label_font = ImageFont.truetype(r'/fonts/ArchivoNarrow-Regular.ttf', 18)
-    list_font = ImageFont.truetype(r'/fonts/BarlowCondensed-Regular.ttf', 22)
+    title_font = ImageFont.truetype('app/fonts/BarlowSemiCondensed-Bold.ttf', 60)
+    year_font = ImageFont.truetype('app/fonts/BarlowCondensed-Thin.ttf', 45)
+    label_font = ImageFont.truetype('app/fonts/ArchivoNarrow-Regular.ttf', 18)
+    list_font = ImageFont.truetype('app/fonts/BarlowCondensed-Regular.ttf', 22)
 
     def __init__(self, movie_id):
         # make background
